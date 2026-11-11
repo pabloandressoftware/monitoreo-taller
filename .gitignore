@@ -1,0 +1,9 @@
+target/
+logs/
+videos/
+evidencia/
+*.zip
+entrega.html
+build.py
+.idea/
+*.log
