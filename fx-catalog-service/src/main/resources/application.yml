@@ -1,0 +1,83 @@
+spring:
+  application:
+    name: fx-catalog-service
+
+server:
+  port: 8002
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    # El cliente guarda una copia local del registro; la refrescamos cada 10 s (por defecto 30 s)
+    registry-fetch-interval-seconds: 10
+
+# --- Resilience4j ---------------------------------------------------------
+resilience4j:
+  circuitbreaker:
+    instances:
+      courseService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+        # Un rechazo del RateLimiter no cuenta como fallo del servicio de cursos
+        ignoreExceptions:
+          - io.github.resilience4j.ratelimiter.RequestNotPermitted
+  retry:
+    instances:
+      courseService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        eventConsumerBufferSize: 10
+        # Con el circuito OPEN no tiene sentido reintentar: se debe responder de inmediato (fail fast)
+        ignoreExceptions:
+          - io.github.resilience4j.circuitbreaker.CallNotPermittedException
+  ratelimiter:
+    instances:
+      courseService:
+        limitForPeriod: 5
+        limitRefreshPeriod: 10s
+        timeoutDuration: 0
+
+# --- Monitoreo con Actuator + métricas por OTLP (Guía 3) --------------------
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,circuitbreakers,circuitbreakerevents,retries,retryevents,ratelimiters
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  otlp:
+    metrics:
+      export:
+        enabled: true
+        # El Colector publica OTLP/HTTP en el 4320 del host (4318 dentro del contenedor)
+        url: http://localhost:4320/v1/metrics
+        step: 10s
+        base-time-unit: seconds
+        resource-attributes:
+          service.name: ${spring.application.name}
+          deployment.environment: taller
+
+# --- OpenTelemetry (API / SDK): trazas + logs por OTLP gRPC al Colector -------
+otel:
+  service:
+    name: fx-catalog-service
+  exporter:
+    otlp:
+      endpoint: http://localhost:4319   # Colector (4319 del host -> 4317 del contenedor)
