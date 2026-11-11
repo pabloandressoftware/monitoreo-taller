@@ -1,6 +1,6 @@
 # FutureXCourseCatalog (fx-catalog-service)
 
-**Autores:** Pablo Andrés Guzmán Alarcón (A00399523, [@pabloandressoftware](https://github.com/pabloandressoftware)) · Stick Martinez (A00398704, [@Stixkl](https://github.com/Stixkl)) · Alejandro Troya (A00399865, [@DavidIsGod](https://github.com/DavidIsGod))
+**Autores:** Pablo Andrés Guzmán Alarcón (A00399523, [@pabloandressoftware](https://github.com/pabloandressoftware)) · Stick Martinez (A00398704, [@Stixkl](https://github.com/Stixkl)) · Alejandro Troya (A00399865, [@DavidIsGod](https://github.com/DavidIsGod)) · Juan David Quintero
 
 Microservicio de catálogo. Descubre a `fx-course-service` a través de Eureka y lo consume con `RestTemplate`.
 Rama `feature/resilience4j`: protege esas llamadas con **Resilience4j**.
