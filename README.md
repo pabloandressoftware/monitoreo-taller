@@ -1,6 +1,6 @@
 # Taller de Monitoreo y Observabilidad — FutureX
 
-**Integrantes:** Pablo Guzmán Alarcón (A00399523), Juan David Quintero, Alejandro Troya y Stick Martinez
+**Integrantes:** Pablo Guzmán Alarcón, Juan David Quintero, Alejandro Troya y Stick Martinez
 
 Observabilidad completa de `fx-catalog-service` y `fx-course-service` con **OpenTelemetry Collector**:
 
