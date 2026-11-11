@@ -1,0 +1,45 @@
+# Guía 3: el Colector recibe OTLP (trazas, métricas, logs) y reparte cada señal a su destino
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 2s
+
+exporters:
+  debug:
+    verbosity: basic
+  otlp/jaeger:                      # trazas -> Jaeger
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+  prometheus:                       # métricas -> Prometheus (scrape a :8889)
+    endpoint: 0.0.0.0:8889
+    # Sin "namespace": así la métrica se llama catalog_courses_request_seconds (como en el taller)
+    resource_to_telemetry_conversion:
+      enabled: true
+  file:                             # logs -> archivo que lee Logstash
+    path: /var/log/otel-collector.log
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/jaeger, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus, debug]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [file, debug]
+  telemetry:
+    logs:
+      level: "info"
