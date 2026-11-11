@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: fx
+    folder: FX Microservicios
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards
